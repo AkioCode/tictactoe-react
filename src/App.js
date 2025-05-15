@@ -32,20 +32,16 @@ export default function Board() {
   const [currentPlayer, setCurrentPlayer] = useState('X');
   const [nextPlayer, setNextPlayer] = useState('O');
   const [winnerSets, setWinnerSets] = useState(initial_winner_sets);
-  const [status, setStatus] = useState(`Next player: ${currentPlayer}`);
+  const [winner, setWinner] = useState(false);
   
   function handleClick(i) {
     if (!squares[i] && remainingTurns > 0) {
-      let nextSquares = squares.slice();
-      nextSquares[i] = currentPlayer;
-      setSquares(nextSquares);
-      
+      setSquares(prev => [...prev.slice(0, i), currentPlayer, ...prev.slice(i + 1)]);
       let nextWinnerSets = winnerSets.slice();
       nextWinnerSets = updateWinnerSets(i, nextWinnerSets, currentPlayer, nextPlayer, remainingTurns);
       setWinnerSets(nextWinnerSets);
-
-      let isWinner = (nextWinnerSets.some((set) => set.every((item) => item === currentPlayer)) ? currentPlayer : false);
-      setStatus(isWinner ? `Winner: ${currentPlayer}` : `Next player: ${currentPlayer}`);
+      const isWinner = nextWinnerSets.some((set) => set.every((item) => item === currentPlayer)) ? currentPlayer : false;
+      setWinner(isWinner);
       setRemainingTurns(isWinner ? 0 : remainingTurns - 1);
       if (!isWinner) {
         setCurrentPlayer(currentPlayer === 'X' ? 'O' : 'X');
@@ -56,7 +52,7 @@ export default function Board() {
     
 
  return <>
-    <div className="status">{status}</div>
+    <div className="status">{winner ? `Winner: ${currentPlayer}` : `Next player: ${currentPlayer}`}</div>
     <div className="board-row">
       < Square value={squares[0]} onSquareClick={() => handleClick(0)}/>
       < Square value={squares[1]} onSquareClick={() => handleClick(1)}/>
